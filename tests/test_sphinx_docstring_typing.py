@@ -57,3 +57,43 @@ def test_autodoc_process_docstring(input_, expected):
     lines = process_sphinx_input(input_)
     assert lines != input_
     assert lines == expected
+
+
+def test_autodoc_process_target():
+    input_ = [
+        '        In addition ``include_syntax`` adds a feature that analyzes',
+        '        the document for semantic and syntactic information.',
+        '',
+        '        .. note::',
+        '',
+        '            This is intended for users who are familiar with machine',
+        '            learning and need in-depth text features to build upon.',
+        '',
+        '        .. _annotateText: https://link.com',
+        '',
+        '        See `annotateText`_.',
+    ]
+    transformed = process_sphinx_input(input_)
+    # There should be nothing to modify here.
+    assert transformed == input_
+
+
+def test_autodoc_process_class_refs():
+    input_ = [
+        'TextAnnotation contains a structured representation of OCR extracted',
+        ('  text. The hierarchy of an OCR extracted text '
+         'structure is like this:'),
+        ('  TextAnnotation -> Page -> Block -> Paragraph -> Word '
+         '-> Symbol Each'),
+        ('  structural component, starting from Page, may further '
+         'have their own'),
+        ('  properties. Properties describe detected languages, '
+         'breaks etc.. Please'),
+        '  refer to the',
+        ('  [google.cloud.vision.v1.TextAnnotation.TextProperty]'
+         '[google.cloud.vision.v1.TextAnnotation.TextProperty]'),
+        '  message definition below for more detail.',
+    ]
+    transformed = process_sphinx_input(input_)
+    # There should be nothing to modify here.
+    assert transformed == input_
