@@ -20,6 +20,18 @@ import pytest
 import sphinx_docstring_typing
 
 
+def process_sphinx_input(input_):
+    app = mock.Mock(spec=['warn', 'verbose'])
+    app.warn.side_effect = print
+    app.verbose.side_effect = print
+
+    lines = input_[::]
+    sphinx_docstring_typing.autodoc_process_docstring(
+        app, None, None, None, None, lines)
+
+    return lines
+
+
 @pytest.mark.parametrize('input_,expected', [
     (['Any'],
      [':py:obj:`~typing.Any`']),
@@ -42,13 +54,6 @@ import sphinx_docstring_typing
      [':py:obj:`~typing.Optional` [ :py:obj:`datetime` ] ']),
 ])
 def test_autodoc_process_docstring(input_, expected):
-    app = mock.Mock(spec=['warn', 'verbose'])
-    app.warn.side_effect = print
-    app.verbose.side_effect = print
-
-    lines = list(input_)
-
-    sphinx_docstring_typing.autodoc_process_docstring(
-        app, None, None, None, None, lines)
-
+    lines = process_sphinx_input(input_)
+    assert lines != input_
     assert lines == expected
